@@ -40,3 +40,8 @@ func NewOptions() *Options {
 		errCh: make(chan error),
 	}
 }
+
+// Flags returns flags for a specific scheduler by section name
+func (o *Options) Flags() {
+
+}
