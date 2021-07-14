@@ -1,0 +1,2 @@
+HealthzBindAddress: "0.0.0.0:12345"
+MetricsBindAddress: "0.0.0.0:12346"

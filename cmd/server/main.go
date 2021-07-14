@@ -12,6 +12,7 @@ import (
 func main() {
 	rand.Seed(time.Now().UnixNano())
 	command := app.NewServerCommand()
+
 	pflag.CommandLine.SetNormalizeFunc(WordSepNormalizeFunc)
 	//pflag.CommandLine.AddGoFlagSet(goflag.CommandLine)
 	if err := command.Execute(); err != nil {

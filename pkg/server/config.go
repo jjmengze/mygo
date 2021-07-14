@@ -15,7 +15,10 @@ type Config struct {
 }
 
 // AddUniversalFlags adds flags for a specific APIServer to the specified FlagSet
-func (c *Config) AddUniversalFlags(fs *pflag.FlagSet) {
+func (c *Config) AddFlags(fs *pflag.FlagSet) {
+	if c == nil {
+		return
+	}
 	fs.IPVar(&c.BindAddress, "advertise-address", c.BindAddress, ""+
 		"The IP address on which to advertise the apiserver to members of the cluster. This "+
 		"address must be reachable by the rest of the cluster. If blank, the --bind-address "+
