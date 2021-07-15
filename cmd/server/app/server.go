@@ -4,9 +4,14 @@ import (
 	"context"
 	"fmt"
 	"github.com/spf13/cobra"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	"k8s.io/klog"
 	"mygo/pkg/signal"
+	"mygo/pkg/telemetry"
 	"os"
+	"time"
 )
 
 const (
@@ -23,6 +28,7 @@ func NewServerCommand() *cobra.Command {
 				klog.Fatalf("failed complete: %v", err)
 			}
 			fmt.Println(opts)
+			fmt.Println(opts.ComponentConfig)
 
 			if err := runCommand(cmd, opts); err != nil {
 				fmt.Fprintf(os.Stderr, "%v\n", err)
@@ -63,6 +69,36 @@ func runCommand(cmd *cobra.Command, options *Options) error {
 
 	ctx, cancel := context.WithCancel(signal.SetupSignalContext())
 	defer cancel()
+
+	flushTracer, err := telemetry.NewTracerProvider(ctx, options.ComponentConfig.Telemetry)
+	if err != nil {
+		klog.Warning("tracing config error:", err)
+	}
+	defer flushTracer()
+	tracer := otel.Tracer("test-tracer")
+	commonLabels := []attribute.KeyValue{
+		attribute.String("labelA", "chocolate"),
+		attribute.String("labelB", "raspberry"),
+		attribute.String("labelC", "vanilla"),
+	}
+
+	tracerCtx, span := tracer.Start(
+		ctx,
+		"CollectorExporter-Example",
+		trace.WithAttributes(commonLabels...))
+	defer span.End()
+
+	childCtx, iSpan := tracer.Start(tracerCtx, fmt.Sprintf("start-%d", -1))
+	for i := 0; i < 10; i++ {
+		func(c context.Context) {
+			var sp trace.Span
+			childCtx, sp = tracer.Start(childCtx, fmt.Sprintf("Sample-%d", i))
+			<-time.After(time.Second)
+			sp.End()
+		}(childCtx)
+
+	}
+	iSpan.End()
 
 	//cc, sched, err := Setup(ctx, opts, registryOptions...)
 	//if err != nil {

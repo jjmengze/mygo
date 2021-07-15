@@ -97,7 +97,6 @@ func (o *Options) loadConfigFromFile(file string) (*config.Config, error) {
 // loadConfig decodes a serialized Options to the internal type.
 func (o *Options) loadConfig(data []byte) (*config.Config, error) {
 	c := &config.Config{}
-	fmt.Println(string(data))
 
 	if err := yaml.Unmarshal(data, c); err != nil {
 		return nil, fmt.Errorf("couldn't decode as server config, got %s: ", err)

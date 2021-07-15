@@ -1,4 +1,18 @@
 {
   "HealthzBindAddress": "0.0.0.0:12345",
-  "MetricsBindAddress": "0.0.0.0:12346"
+  "MetricsBindAddress": "0.0.0.0:12346",
+  "Telemetry": {
+    "Name": "jaeger",
+    "ResourceAttributes": [
+      {
+        "Key": "env",
+        "Value": "example"
+      }
+    ],
+    "EndPoint": "http://localhost:14268/api/traces",
+    "Jaeger": {
+      "Password": "passwd",
+      "UserName": "admin"
+    }
+  }
 }
