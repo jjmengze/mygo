@@ -19,7 +19,7 @@ func NewTracerProvider(ctx context.Context, config Config) (func() error, error)
 	if config.Jaeger != nil {
 		tracerProvider, err = initJaegerTracerProvider(ctx, config)
 	} else {
-		tracerProvider, err = initProvider(ctx, config)
+		tracerProvider, err = initCollectorProvider(ctx, config)
 	}
 	if err != nil {
 		return nil, err
@@ -36,7 +36,8 @@ func NewTracerProvider(ctx context.Context, config Config) (func() error, error)
 	}, nil
 }
 
-func initProvider(ctx context.Context, config Config) (*sdktrace.TracerProvider, error) {
+//	 initCollectorProvider offers a vendor-agnostic implementation on how to receive, process and export telemetry data.
+func initCollectorProvider(ctx context.Context, config Config) (*sdktrace.TracerProvider, error) {
 	res := resource.NewWithAttributes(
 		semconv.SchemaURL,
 		semconv.ServiceNameKey.String(config.Name),
