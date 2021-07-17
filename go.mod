@@ -7,14 +7,15 @@ require (
 	github.com/labstack/echo/v4 v4.4.0
 	github.com/lib/pq v1.10.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.6 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/pflag v1.0.5
 	go.opentelemetry.io/otel v1.0.0-RC1
 	go.opentelemetry.io/otel/exporters/jaeger v1.0.0-RC1
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.0.0-RC1
+	go.opentelemetry.io/otel/exporters/prometheus v0.21.0
 	go.opentelemetry.io/otel/metric v0.21.0
 	go.opentelemetry.io/otel/sdk v1.0.0-RC1
+	go.opentelemetry.io/otel/sdk/export/metric v0.21.0
 	go.opentelemetry.io/otel/sdk/metric v0.21.0
 	go.opentelemetry.io/otel/trace v1.0.0-RC1
 	google.golang.org/grpc v1.38.0

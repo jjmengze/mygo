@@ -72,7 +72,7 @@ func runCommand(cmd *cobra.Command, options *Options) error {
 	ctx, cancel := context.WithCancel(signal.SetupSignalContext())
 	defer cancel()
 
-	flushTracer, err := telemetry.NewTracerProvider(ctx, options.ComponentConfig.Telemetry)
+	flushTracer, err := telemetry.NewTelemetryProvider(ctx, options.ComponentConfig.Telemetry)
 	if err != nil {
 		klog.Warning("tracing config error:", err)
 	}
@@ -98,10 +98,6 @@ func runCommand(cmd *cobra.Command, options *Options) error {
 			metric.WithDescription("The worker testedd time"),
 		).Bind(commonLabels...)
 	defer workTime.Unbind()
-
-	metric.Must(meter).NewFloat64SumObserver("appdemo/request_latency", func(ctx context.Context, result metric.Float64ObserverResult) {
-		fmt.Println(result)
-	})
 	requestLatency := metric.Must(meter).
 		NewFloat64ValueRecorder(
 			"appdemo/request_latency",

@@ -1,11 +1,13 @@
-HealthzBindAddress: "0.0.0.0:12345"
-MetricsBindAddress: "0.0.0.0:12346"
-  Telemetry:
-    Name: jaeger
-    ResourceAttributes:
-      - Key: env
-        Value: example
-    EndPoint: "0.0.0.0:55300"
+healthzBindAddress: "0.0.0.0:12345"
+#MetricsBindAddress: "0.0.0.0:12346"
+telemetry:
+  name: jaeger
+  resourceAttributes:
+    - key: env
+      value: example
+  endPoint: "0.0.0.0:64665"
+  Prometheus:
+    MetricsBindAddress: "0.0.0.0:10251"
 #    EndPoint: http://localhost:14268/api/traces
 #    Jaeger:
 #      Password: passwd

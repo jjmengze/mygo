@@ -98,7 +98,7 @@ func (o *Options) loadConfigFromFile(file string) (*config.Config, error) {
 func (o *Options) loadConfig(data []byte) (*config.Config, error) {
 	c := &config.Config{}
 
-	if err := yaml.Unmarshal(data, c); err != nil {
+	if err := yaml.UnmarshalStrict(data, c); err != nil {
 		return nil, fmt.Errorf("couldn't decode as server config, got %s: ", err)
 	}
 	return c, nil
