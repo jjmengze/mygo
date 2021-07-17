@@ -29,7 +29,6 @@ func NewTracerProvider(ctx context.Context, config Config) (func() error, error)
 
 	// set global propagator to tracecontext (the default is no-op).
 	otel.SetTextMapPropagator(propagation.TraceContext{})
-
 	return func() error {
 		// Shutdown will flush any remaining spans and shut down the exporter.
 		return tracerProvider.Shutdown(ctx)
@@ -46,9 +45,10 @@ func initCollectorProvider(ctx context.Context, config Config) (*sdktrace.Tracer
 	// Set up a trace exporter
 	traceExporter, err := otlptracegrpc.New(ctx,
 		otlptracegrpc.WithInsecure(),
-		otlptracegrpc.WithEndpoint("localhost:30080"),
-		otlptracegrpc.WithDialOption(grpc.WithBlock()),
+		otlptracegrpc.WithEndpoint(config.EndPoint),
+		otlptracegrpc.WithDialOption(grpc.WithBlock()), // useful for testing
 	)
+
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,6 @@ func initCollectorProvider(ctx context.Context, config Config) (*sdktrace.Tracer
 		sdktrace.WithResource(res),
 		sdktrace.WithSpanProcessor(bsp),
 	)
-
 	return tracerProvider, nil
 }
 

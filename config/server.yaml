@@ -5,7 +5,8 @@ MetricsBindAddress: "0.0.0.0:12346"
     ResourceAttributes:
       - Key: env
         Value: example
-    EndPoint: http://localhost:14268/api/traces
-    Jaeger:
-      Password: passwd
-      UserName: admin
+    EndPoint: "0.0.0.0:55300"
+#    EndPoint: http://localhost:14268/api/traces
+#    Jaeger:
+#      Password: passwd
+#      UserName: admin

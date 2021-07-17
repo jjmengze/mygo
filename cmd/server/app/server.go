@@ -6,6 +6,8 @@ import (
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/trace"
 	"k8s.io/klog"
 	"mygo/pkg/signal"
@@ -76,6 +78,7 @@ func runCommand(cmd *cobra.Command, options *Options) error {
 	}
 	defer flushTracer()
 	tracer := otel.Tracer("test-tracer")
+	meter := global.Meter("test-meter")
 	commonLabels := []attribute.KeyValue{
 		attribute.String("labelA", "chocolate"),
 		attribute.String("labelB", "raspberry"),
@@ -89,16 +92,36 @@ func runCommand(cmd *cobra.Command, options *Options) error {
 	defer span.End()
 
 	childCtx, iSpan := tracer.Start(tracerCtx, fmt.Sprintf("start-%d", -1))
+	workTime := metric.Must(meter).
+		NewInt64Counter(
+			"test time",
+			metric.WithDescription("The worker testedd time"),
+		).Bind(commonLabels...)
+	defer workTime.Unbind()
+
+	metric.Must(meter).NewFloat64SumObserver("appdemo/request_latency", func(ctx context.Context, result metric.Float64ObserverResult) {
+		fmt.Println(result)
+	})
+	requestLatency := metric.Must(meter).
+		NewFloat64ValueRecorder(
+			"appdemo/request_latency",
+			metric.WithDescription("The latency of requests processed"),
+		).Bind(commonLabels...)
+	defer requestLatency.Unbind()
+	latencyMs := float64(time.Since(time.Now())) / 1e6
 	for i := 0; i < 10; i++ {
 		func(c context.Context) {
 			var sp trace.Span
+			requestLatency.Record(childCtx, latencyMs)
 			childCtx, sp = tracer.Start(childCtx, fmt.Sprintf("Sample-%d", i))
+			requestLatency.Record(ctx, latencyMs)
+			latencyMs = float64(time.Since(time.Now())) / 1e6
 			<-time.After(time.Second)
 			sp.End()
 		}(childCtx)
 
 	}
-	iSpan.End()
+	defer iSpan.End()
 
 	//cc, sched, err := Setup(ctx, opts, registryOptions...)
 	//if err != nil {

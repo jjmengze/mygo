@@ -9,10 +9,7 @@
         "Value": "example"
       }
     ],
-    "EndPoint": "http://localhost:14268/api/traces",
-    "Jaeger": {
-      "Password": "passwd",
-      "UserName": "admin"
-    }
+    "EndPoint": "0.0.0.0:62222"
+
   }
 }
