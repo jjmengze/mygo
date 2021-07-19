@@ -2,8 +2,24 @@ package valid
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"net"
+	"regexp"
 )
+
+const envVarNameFmt = "[-._a-zA-Z][-._a-zA-Z0-9]*"
+const envVarNameFmtErrMsg string = "a valid environment variable name must consist of alphabetic characters, digits, '_', '-', or '.', and must not start with a digit"
+
+var envVarNameRegexp = regexp.MustCompile("^" + envVarNameFmt + "$")
+
+// IsEnvVarName tests if a string is a valid environment variable name.
+func IsEnvVarName(value string) error {
+	if !envVarNameRegexp.MatchString(value) {
+		return errors.New(envVarNameFmtErrMsg)
+	}
+
+	return nil
+}
 
 // InclusiveRangeError returns a string explanation of a numeric "must be
 // between" validation failure.
