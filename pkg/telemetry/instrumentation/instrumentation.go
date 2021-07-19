@@ -1,6 +1,8 @@
 package instrumentation
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type RecordingResponseWriter struct {
 	http.ResponseWriter
@@ -14,7 +16,12 @@ func NewRecordingResponseWriter(writer http.ResponseWriter) *RecordingResponseWr
 }
 
 func (w *RecordingResponseWriter) WriteHeader(status int) {
+	w.StatusCode = status
 	w.ResponseWriter.WriteHeader(status)
+}
+
+func (w *RecordingResponseWriter) Header() http.Header {
+	return w.ResponseWriter.Header()
 }
 
 func (w *RecordingResponseWriter) Write(b []byte) (int, error) {

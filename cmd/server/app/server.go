@@ -141,6 +141,7 @@ func Run(ctx context.Context) error {
 	}
 	mux.Use(telemetrygorila.Middleware())
 	mux.HandleFunc("/happy", func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(http.StatusOK)
 		writer.Write([]byte("Hello, World!"))
 	})
 
