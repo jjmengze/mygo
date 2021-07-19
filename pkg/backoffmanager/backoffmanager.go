@@ -1,7 +1,6 @@
 package backoffmanager
 
 import (
-	"fmt"
 	"math"
 	"math/rand"
 	"time"
@@ -49,9 +48,7 @@ func NewExponentialBackoffManager(initBackoff, maxBackoff, resetDuration time.Du
 
 func (b *exponentialBackoffManager) getNextBackoff() time.Duration {
 	b.clock = b.nowFunc()
-	fmt.Printf("start - end :%s - %s = %s \n", b.clock, b.lastBackoffStart, b.clock.Sub(b.lastBackoffStart))
 	if b.clock.Sub(b.lastBackoffStart) > b.backoffResetDuration {
-		fmt.Println("i am here")
 		b.backoff.Steps = math.MaxInt32
 		b.backoff.Duration = b.initialBackoff
 	}

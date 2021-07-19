@@ -15,13 +15,15 @@ func TestBackoff_Step(t *testing.T) {
 		{
 			initial: &Backoff{
 				Duration: time.Second,
+				Steps:    5,
 				Factor:   2,
-				Steps:    3,
 				Cap:      3 * time.Second,
 			},
 			want: []time.Duration{
 				1 * time.Second,
 				2 * time.Second,
+				3 * time.Second,
+				3 * time.Second,
 				3 * time.Second,
 			},
 		},
