@@ -5,6 +5,7 @@ import (
 	"errors"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/metric/global"
@@ -23,21 +24,37 @@ import (
 	"net"
 	"net/http"
 	"strconv"
+	"time"
 )
+
+var defaultTimeout = 1 * time.Second
 
 func NewTelemetryProvider(ctx context.Context, config Config) (func() error, error) {
 	var tracerProvider *sdktrace.TracerProvider
 	//Prometheus exporter
 	var metricProvider *prometheus.Exporter
 	var err error
+	//initBackoffTime := 10 * time.Millisecond
+	//maxBackoffTime := 1 * time.Second
+	//backoffFactor := 2.0
+	//jitter := 1.1
+	//
+	//backoff := backoffmanager.NewExponentialBackoffManager(initBackoffTime, maxBackoffTime, time.Second, backoffFactor, jitter, time.Now)
+	//retryTime := 0
+	//select {
+	//case <-backoff.Backoff().C:
 	if config.Jaeger != nil {
 		tracerProvider, err = initJaegerTracerProvider(ctx, config)
 	} else {
 		tracerProvider, err = initCollectorProvider(ctx, config)
 	}
+	//if err != nil || retryTime == 5 {
 	if err != nil {
+
 		return nil, err
 	}
+	//retryTime++
+	//}
 
 	if config.Prometheus != nil {
 		metricProvider, err = initPrometheusProvider(ctx, config.Prometheus)
@@ -66,12 +83,22 @@ func initCollectorProvider(ctx context.Context, config Config) (*sdktrace.Tracer
 		semconv.ServiceNameKey.String(config.Name),
 	)
 
-	// Set up a trace exporter
-	traceExporter, err := otlptracegrpc.New(ctx,
+	client := otlptracegrpc.NewClient(otlptracegrpc.WithTimeout(time.Duration(2*time.Second)),
+		otlptracegrpc.WithRetry(otlptracegrpc.RetrySettings{
+			Enabled:         true,
+			MaxElapsedTime:  time.Minute,
+			InitialInterval: time.Nanosecond,
+			MaxInterval:     time.Nanosecond,
+		}),
 		otlptracegrpc.WithInsecure(),
+		otlptracegrpc.WithTimeout(10*time.Millisecond),
 		otlptracegrpc.WithEndpoint(config.EndPoint),
+		otlptracegrpc.WithReconnectionPeriod(50*time.Millisecond),
 		otlptracegrpc.WithDialOption(grpc.WithBlock()), // useful for testing
 	)
+
+	// Set up a trace exporter
+	traceExporter, err := otlptrace.New(ctx, client)
 
 	if err != nil {
 		return nil, err
@@ -138,7 +165,7 @@ func initPrometheusProvider(ctx context.Context, config *Prometheus) (*prometheu
 	if err := valid.IsValidIP(ip); err != nil {
 		ip = "0.0.0.0"
 	}
-	http.HandleFunc("/", exporter.ServeHTTP)
+	http.HandleFunc("/metric", exporter.ServeHTTP)
 	go func() {
 		_ = http.ListenAndServe(net.JoinHostPort(ip, port), nil)
 	}()

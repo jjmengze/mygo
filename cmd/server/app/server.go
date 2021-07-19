@@ -10,8 +10,12 @@ import (
 	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/trace"
 	"k8s.io/klog"
+	"mygo/pkg/route/gorilla"
+	"mygo/pkg/server"
 	"mygo/pkg/signal"
 	"mygo/pkg/telemetry"
+	telemetrygorila "mygo/pkg/telemetry/gorilla"
+	"net/http"
 	"os"
 	"time"
 )
@@ -112,7 +116,7 @@ func runCommand(cmd *cobra.Command, options *Options) error {
 			childCtx, sp = tracer.Start(childCtx, fmt.Sprintf("Sample-%d", i))
 			requestLatency.Record(ctx, latencyMs)
 			latencyMs = float64(time.Since(time.Now())) / 1e6
-			<-time.After(time.Second)
+			<-time.After(time.Millisecond)
 			sp.End()
 		}(childCtx)
 
@@ -128,8 +132,25 @@ func runCommand(cmd *cobra.Command, options *Options) error {
 }
 
 // Run executes the Server based on the given configuration. It only returns on error or when context is done.
-func Run(stopCh context.Context) error {
+func Run(ctx context.Context) error {
 	// To help debugging, immediately log version
 	//klog.Infof("Version: %+v", version.Get())
+	mux, err := gorilla.NewGorillaServer()
+	if err != nil {
+		return err
+	}
+	mux.Use(telemetrygorila.Middleware())
+	mux.HandleFunc("/happy", func(writer http.ResponseWriter, request *http.Request) {
+		writer.Write([]byte("Hello, World!"))
+	})
+
+	//route.NewAPIServer(mux)
+	srv, err := server.NewServer(server.Config{BindAddress: "0.0.0.0:8080"})
+	if err != nil {
+		return err
+	}
+
+	srv.ServeHTTPHandler(ctx, mux)
+
 	return nil
 }
