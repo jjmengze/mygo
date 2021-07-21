@@ -1,0 +1,9 @@
+exampleServer: "0.0.0.0:64665"
+telemetry:
+  name: client
+  resourceAttributes:
+    - key: env
+      value: example-client
+  endPoint: "0.0.0.0:64665"
+  prometheus:
+    metricsBindAddress: "0.0.0.0:10252"

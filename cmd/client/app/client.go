@@ -10,11 +10,9 @@ import (
 	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/trace"
 	"k8s.io/klog"
-	"mygo/pkg/route/gorilla"
-	"mygo/pkg/server"
 	"mygo/pkg/signal"
 	"mygo/pkg/telemetry"
-	telemetrygorila "mygo/pkg/telemetry/gorilla"
+	telemetryhttp "mygo/pkg/telemetry/http"
 	"net/http"
 	"os"
 	"time"
@@ -25,7 +23,7 @@ const (
 	component = "server"
 )
 
-func NewServerCommand() *cobra.Command {
+func NewClientCommand() *cobra.Command {
 	opts := NewOptions()
 	cmd := &cobra.Command{
 		Use: component,
@@ -81,21 +79,22 @@ func runCommand(cmd *cobra.Command, options *Options) error {
 		klog.Warning("tracing config error:", err)
 	}
 	defer flushTracer()
-	tracer := otel.Tracer("test-tracer")
-	meter := global.Meter("test-meter")
+	tracer := otel.Tracer("client")
+	meter := global.Meter("test-client")
 	commonLabels := []attribute.KeyValue{
 		attribute.String("labelA", "chocolate"),
 		attribute.String("labelB", "raspberry"),
 		attribute.String("labelC", "vanilla"),
 	}
-
+	//
 	tracerCtx, span := tracer.Start(
 		ctx,
-		"CollectorExporter-Example",
+		"Client-example-request",
 		trace.WithAttributes(commonLabels...))
 	defer span.End()
 
-	childCtx, iSpan := tracer.Start(tracerCtx, fmt.Sprintf("start-%d", -1))
+	childCtx, iSpan := tracer.Start(tracerCtx, fmt.Sprintf("start-"))
+
 	workTime := metric.Must(meter).
 		NewInt64Counter(
 			"test time",
@@ -108,16 +107,29 @@ func runCommand(cmd *cobra.Command, options *Options) error {
 			metric.WithDescription("The latency of requests processed"),
 		).Bind(commonLabels...)
 	defer requestLatency.Unbind()
+
 	latencyMs := float64(time.Since(time.Now())) / 1e6
+	httpClient := telemetryhttp.HttpClientWithTransport(http.DefaultTransport)
 	for i := 0; i < 10; i++ {
 		func(c context.Context) {
 			var sp trace.Span
 			requestLatency.Record(childCtx, latencyMs)
 			childCtx, sp = tracer.Start(childCtx, fmt.Sprintf("Sample-%d", i))
+			defer sp.End()
+			req, err := http.NewRequestWithContext(childCtx, "GET", "http://0.0.0.0:8080/happy", nil)
+			if err != nil {
+				panic(err)
+			}
+			fmt.Printf("Sending request...\n")
+			_, err = httpClient.Do(req)
+			//_,err=http.DefaultClient.Do(req)
+			if err != nil {
+				panic(err)
+			}
+
 			requestLatency.Record(ctx, latencyMs)
 			latencyMs = float64(time.Since(time.Now())) / 1e6
 			<-time.After(time.Millisecond)
-			sp.End()
 		}(childCtx)
 
 	}
@@ -135,24 +147,5 @@ func runCommand(cmd *cobra.Command, options *Options) error {
 func Run(ctx context.Context) error {
 	// To help debugging, immediately log version
 	//klog.Infof("Version: %+v", version.Get())
-	mux, err := gorilla.NewGorillaServer()
-	if err != nil {
-		return err
-	}
-	mux.Use(telemetrygorila.Middleware())
-	mux.HandleFunc("/happy", func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Println("Hello")
-		writer.WriteHeader(http.StatusOK)
-		//writer.Write([]byte("Hello, World!"))
-	})
-
-	//route.NewAPIServer(mux)
-	srv, err := server.NewServer(server.Config{BindAddress: "0.0.0.0:8080"})
-	if err != nil {
-		return err
-	}
-
-	srv.ServeHTTPHandler(ctx, mux)
-
 	return nil
 }
