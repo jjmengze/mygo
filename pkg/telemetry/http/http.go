@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"go.opentelemetry.io/otel/propagation"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"net/http"
@@ -29,8 +30,9 @@ func (t *Transport) RoundTrip(request *http.Request) (*http.Response, error) {
 			return t.config.base.RoundTrip(request)
 		}
 	}
-	tracer := t.config.TracerProvider.Tracer("apple")
-	ctx, span := tracer.Start(request.Context(), "RoundTrip")
+	tracer := t.config.TracerProvider.Tracer("")
+	ctx, span := tracer.Start(request.Context(), fmt.Sprintf("Send to : %s ", request.URL))
+
 	defer span.End()
 	req := request.WithContext(ctx)
 	span.SetAttributes(semconv.HTTPClientAttributesFromHTTPRequest(req)...)
@@ -39,7 +41,6 @@ func (t *Transport) RoundTrip(request *http.Request) (*http.Response, error) {
 	res, err := t.config.base.RoundTrip(req)
 	if err != nil {
 		span.RecordError(err)
-		span.End()
 		return res, err
 	}
 	span.SetAttributes(semconv.HTTPAttributesFromHTTPStatusCode(res.StatusCode)...)

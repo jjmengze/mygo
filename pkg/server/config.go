@@ -7,7 +7,7 @@ import (
 type Config struct {
 	// bindAddress is the IP address for the proxy server to serve on (set to 0.0.0.0
 	// for all interfaces)
-	BindAddress string
+	BindAddress string	`json:"bindAddress"`
 }
 
 // AddUniversalFlags adds flags for a specific APIServer to the specified FlagSet

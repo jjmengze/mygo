@@ -1,5 +1,6 @@
 healthzBindAddress: "0.0.0.0:12345"
 #MetricsBindAddress: "0.0.0.0:12346"
+
 telemetry:
   name: jaeger
   resourceAttributes:

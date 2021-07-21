@@ -128,11 +128,11 @@ func runCommand(cmd *cobra.Command, options *Options) error {
 	//	return err
 	//}
 
-	return Run(ctx)
+	return Run(ctx, options)
 }
 
 // Run executes the Server based on the given configuration. It only returns on error or when context is done.
-func Run(ctx context.Context) error {
+func Run(ctx context.Context, options *Options) error {
 	// To help debugging, immediately log version
 	//klog.Infof("Version: %+v", version.Get())
 	mux, err := gorilla.NewGorillaServer()
@@ -147,7 +147,7 @@ func Run(ctx context.Context) error {
 	})
 
 	//route.NewAPIServer(mux)
-	srv, err := server.NewServer(server.Config{BindAddress: "0.0.0.0:8080"})
+	srv, err := server.NewServer(options.InsecureServing)
 	if err != nil {
 		return err
 	}

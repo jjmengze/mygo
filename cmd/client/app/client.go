@@ -20,7 +20,7 @@ import (
 
 const (
 	// component name
-	component = "server"
+	component = "client"
 )
 
 func NewClientCommand() *cobra.Command {
@@ -79,6 +79,7 @@ func runCommand(cmd *cobra.Command, options *Options) error {
 		klog.Warning("tracing config error:", err)
 	}
 	defer flushTracer()
+
 	tracer := otel.Tracer("client")
 	meter := global.Meter("test-client")
 	commonLabels := []attribute.KeyValue{
@@ -86,52 +87,58 @@ func runCommand(cmd *cobra.Command, options *Options) error {
 		attribute.String("labelB", "raspberry"),
 		attribute.String("labelC", "vanilla"),
 	}
-	//
+
 	tracerCtx, span := tracer.Start(
 		ctx,
 		"Client-example-request",
 		trace.WithAttributes(commonLabels...))
 	defer span.End()
 
-	childCtx, iSpan := tracer.Start(tracerCtx, fmt.Sprintf("start-"))
+	childCtx, iSpan := tracer.Start(tracerCtx, fmt.Sprintf("start"))
 
 	workTime := metric.Must(meter).
 		NewInt64Counter(
 			"test time",
-			metric.WithDescription("The worker testedd time"),
+			metric.WithDescription("The worker tested time"),
 		).Bind(commonLabels...)
 	defer workTime.Unbind()
+
 	requestLatency := metric.Must(meter).
 		NewFloat64ValueRecorder(
-			"appdemo/request_latency",
+			"test request_latency",
 			metric.WithDescription("The latency of requests processed"),
 		).Bind(commonLabels...)
 	defer requestLatency.Unbind()
 
 	latencyMs := float64(time.Since(time.Now())) / 1e6
 	httpClient := telemetryhttp.HttpClientWithTransport(http.DefaultTransport)
+
 	for i := 0; i < 10; i++ {
 		func(c context.Context) {
 			var sp trace.Span
-			requestLatency.Record(childCtx, latencyMs)
+
 			childCtx, sp = tracer.Start(childCtx, fmt.Sprintf("Sample-%d", i))
 			defer sp.End()
-			req, err := http.NewRequestWithContext(childCtx, "GET", "http://0.0.0.0:8080/happy", nil)
+
+			req, err := http.NewRequestWithContext(childCtx, "GET", options.ComponentConfig.ExampleServer+"/happy", nil)
+			if err != nil {
+				panic(err)
+			}
+
+			req, err = http.NewRequestWithContext(childCtx, "GET", "http://0.0.0.0:8080/happy", nil)
 			if err != nil {
 				panic(err)
 			}
 			fmt.Printf("Sending request...\n")
 			_, err = httpClient.Do(req)
-			//_,err=http.DefaultClient.Do(req)
 			if err != nil {
 				panic(err)
 			}
 
-			requestLatency.Record(ctx, latencyMs)
 			latencyMs = float64(time.Since(time.Now())) / 1e6
 			<-time.After(time.Millisecond)
+			requestLatency.Record(ctx, latencyMs)
 		}(childCtx)
-
 	}
 	defer iSpan.End()
 

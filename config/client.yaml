@@ -1,4 +1,4 @@
-exampleServer: "0.0.0.0:64665"
+exampleServer: "http://0.0.0.0:8080"
 telemetry:
   name: client
   resourceAttributes:
