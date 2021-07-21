@@ -1,0 +1,27 @@
+UNAME := $(shell uname)
+XARGS = xargs
+ARCH ?= $(shell go env GOARCH)
+
+GO           ?= go
+GO_VERSION        ?= $(shell $(GO) version)
+GO_VERSION_NUMBER ?= $(word 3, $(GO_VERSION))
+
+
+DOCKER_ARCHS            ?= amd64
+BUILD_DOCKER_ARCHS = $(addprefix common-docker-,$(DOCKER_ARCHS))
+PUBLISH_DOCKER_ARCHS = $(addprefix common-docker-publish-,$(DOCKER_ARCHS))
+TAG_DOCKER_ARCHS = $(addprefix common-docker-tag-latest-,$(DOCKER_ARCHS))
+
+
+DOCKER_REPO             ?= example //todo fix your repo name
+DOCKERBUILD_CONTEXT     ?= ./
+DOCKERFILE_PATH         ?= ./build/Dockerfile
+DOCKER_IMAGE_TAG        ?= $(subst /,-,$(shell git rev-parse --abbrev-ref HEAD))
+
+common-docker: $(BUILD_DOCKER_ARCHS)
+$(BUILD_DOCKER_ARCHS): common-docker-%:
+	docker build -t "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME)-linux-$*:$(DOCKER_IMAGE_TAG)" \
+		-f $(DOCKERFILE_PATH) \
+		--build-arg ARCH="$*" \
+		--build-arg OS="linux" \
+		$(DOCKERBUILD_CONTEXT)

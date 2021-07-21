@@ -1,3 +1,5 @@
+include Makefile.common
+
 lint:
 	@command -v golangci-lint > /dev/null 2>&1 || (cd $${TMPDIR} && go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.38.0)
 	golangci-lint run --config .golangci.yaml
@@ -16,3 +18,8 @@ test:
 test-coverage:
 	@go tool cover -func=./coverage.out
 .PHONY: test-coverage
+
+
+
+go-version:
+	@echo $(DOCKER_IMAGE_TAG)
