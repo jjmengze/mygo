@@ -12,8 +12,11 @@ BUILD_DOCKER_ARCHS = $(addprefix common-docker-,$(DOCKER_ARCHS))
 PUBLISH_DOCKER_ARCHS = $(addprefix common-docker-publish-,$(DOCKER_ARCHS))
 TAG_DOCKER_ARCHS = $(addprefix common-docker-tag-latest-,$(DOCKER_ARCHS))
 
+#todo fix your repo name
+DOCKER_REPO             ?= example
+#todo fix your app name
+DOCKER_IMAGE_NAME       ?= server
 
-DOCKER_REPO             ?= example //todo fix your repo name
 DOCKERBUILD_CONTEXT     ?= ./
 DOCKERFILE_PATH         ?= ./build/Dockerfile
 DOCKER_IMAGE_TAG        ?= $(subst /,-,$(shell git rev-parse --abbrev-ref HEAD))
@@ -22,6 +25,7 @@ common-docker: $(BUILD_DOCKER_ARCHS)
 $(BUILD_DOCKER_ARCHS): common-docker-%:
 	docker build -t "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME)-linux-$*:$(DOCKER_IMAGE_TAG)" \
 		-f $(DOCKERFILE_PATH) \
+		--build-arg TARGET=$(DOCKER_IMAGE_NAME) \
 		--build-arg ARCH="$*" \
 		--build-arg OS="linux" \
 		$(DOCKERBUILD_CONTEXT)
