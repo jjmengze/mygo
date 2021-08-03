@@ -1,8 +1,11 @@
 package gorm
 
 import (
-	"fmt"
+	"errors"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"k8s.io/klog"
+	"mygo/pkg/backoffmanager"
 	"mygo/pkg/repo"
 	"time"
 
@@ -12,21 +15,48 @@ import (
 	"gorm.io/driver/sqlite"
 )
 
-// NewDB initialize a gorm.DB for further usage
+// NewDatabase initialize a gorm.DB for further usage
 func NewDatabase(config repo.Config) (*gorm.DB, error) {
-	connectionFunc := supported[config.Driver]
-	if connectionFunc == nil {
-		return nil, fmt.Errorf("not supported DB driver : %s", config.Driver)
+	backoff := backoffmanager.NewExponentialBackoffManager(time.Millisecond, time.Second, 10*time.Second, 1.1, 1.1, time.Now)
+	connection, err := repo.GetConnection(config)
+	if err != nil {
+		return nil, err
 	}
-
-	driver := connectionFunc(config)
+	driver, err := translationDialector(config.Driver, connection)
+	if err != nil {
+		return nil, err
+	}
 
 	gormCfg := &gorm.Config{
 		NowFunc: func() time.Time {
 			return time.Now().UTC()
 		},
 	}
-	engine, err := gorm.Open(driver, gormCfg)
+	if config.Debug == true {
+		gormCfg.Logger = logger.Default.LogMode(logger.Info)
+	}
+
+	var engine *gorm.DB
+	retry := repo.DefaultRetryTime
+	if config.RetryTime != 0 {
+		retry = config.RetryTime
+	}
+	for i := 0; i < retry; i++ {
+		<-backoff.Backoff().C
+		engine, err = gorm.Open(driver, gormCfg)
+		if err != nil {
+			klog.Errorf(" %s open failed: %v", config.Driver, err)
+		}
+		db, err := engine.DB()
+		if err != nil {
+			klog.Errorf("%s get DB error: %v", config.Driver, err)
+		}
+		err = db.Ping()
+		if err != nil {
+			klog.Errorf("%s ping DB error: %v", config.Driver, err)
+		}
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -34,38 +64,22 @@ func NewDatabase(config repo.Config) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	db.SetConnMaxLifetime(*config.MaxLifetime)
-	db.SetMaxOpenConns(*config.MaxOpenConn)
-	db.SetConnMaxIdleTime(*config.MaxIdleTime)
-	db.SetMaxIdleConns(*config.MaxIdleConn)
+	repo.SetOption(config, db)
+
 	return engine, nil
 }
 
-var supported = map[string]func(cfg repo.Config) gorm.Dialector{
-	"cloudsql": func(cfg repo.Config) gorm.Dialector {
-		return mysql.Open(fmt.Sprintf(
-			"%s:%s@unix(/cloudsql/%s)/%s?charset=utf8mb4&parseTime=true&loc=UTC&time_zone=UTC&timeout=%s&readTimeout=%s&writeTimeout=%s",
-			cfg.User, cfg.Password, cfg.InstanceName, cfg.Database, cfg.ConnectTimeout, cfg.ReadTimeout, cfg.WriteTimeout,
-		))
-	},
-	"mysql": func(cfg repo.Config) gorm.Dialector {
-		return mysql.Open(fmt.Sprintf(
-			"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=true&loc=UTC&time_zone=UTC&timeout=%s&readTimeout=%s&writeTimeout=%s",
-			cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Database, cfg.ConnectTimeout, cfg.ReadTimeout, cfg.WriteTimeout,
-		))
-	},
-	"postgres": func(cfg repo.Config) gorm.Dialector {
-		ssl := "disable"
-		if cfg.SSLMode {
-			ssl = "allow"
-		}
-		// TODO: 增加read,write,conn timeout
-		return postgres.Open(fmt.Sprintf(
-			"host=%s port=%d user=%s dbname=%s password=%s sslmode=%s timezone=UTC",
-			cfg.Host, cfg.Port, cfg.User, cfg.Database, cfg.Password, ssl,
-		))
-	},
-	"sqlite": func(cfg repo.Config) gorm.Dialector {
-		return sqlite.Open(fmt.Sprintf("%s.db", cfg.Database))
-	},
+func translationDialector(driver repo.DriverType, connection string) (gorm.Dialector, error) {
+	switch driver {
+	case repo.MySQL:
+		return mysql.Open(connection), nil
+	case repo.Postgres:
+		return postgres.Open(connection), nil
+	case repo.CloudSql:
+		return mysql.Open(connection), nil
+	case repo.SqlLite:
+		return sqlite.Open(connection), nil
+	default:
+		return nil, errors.New("Not support type")
+	}
 }

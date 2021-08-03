@@ -28,6 +28,10 @@ type exponentialBackoffManager struct {
 	nowFunc              func() time.Time
 }
 
+// NewExponentialBackoffManager 需要設置最初始延遲時間initBackoff，最大延遲時間maxBackoff。
+// 若是 backoff 時間超過，最大延遲時間 maxBackoff 之後的 backoff 時間只會是加上抖動 jitter。
+// resetDuration 表示，捼果 backoff 時間超過所所設定重置時間表示 backoff 工作做太久需要重置，backoff 會退回 initBackoff。
+// backoffFactor 倍數因子，每次 backoff 需要增量的倍數。
 func NewExponentialBackoffManager(initBackoff, maxBackoff, resetDuration time.Duration, backoffFactor, jitter float64, nowFunc func() time.Time) BackoffManager {
 	return &exponentialBackoffManager{
 		backoff: &Backoff{
