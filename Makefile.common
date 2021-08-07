@@ -29,3 +29,14 @@ $(BUILD_DOCKER_ARCHS): common-docker-%:
 		--build-arg ARCH="$*" \
 		--build-arg OS="linux" \
 		$(DOCKERBUILD_CONTEXT)
+
+gqlgen-tools:
+	go install github.com/99designs/gqlgen
+
+lint-tools:
+	@command -v golangci-lint > /dev/null 2>&1 || (cd $${TMPDIR} && go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.38.0)
+
+
+
+
+

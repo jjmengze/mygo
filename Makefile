@@ -1,10 +1,13 @@
 include Makefile.common
 
-lint:
-	@command -v golangci-lint > /dev/null 2>&1 || (cd $${TMPDIR} && go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.38.0)
+lint: lint-tools
 	golangci-lint run --config .golangci.yaml
 .PHONY: lint
 
+gen: gqlgen-tools
+	# generate GQL model & resolver
+	gqlgen
+.PHONY: gen
 
 test:
 	@go test \
@@ -18,8 +21,3 @@ test:
 test-coverage:
 	@go tool cover -func=./coverage.out
 .PHONY: test-coverage
-
-
-
-go-version:
-	@echo $(DOCKER_IMAGE_TAG)
