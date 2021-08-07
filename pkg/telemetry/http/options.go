@@ -55,3 +55,27 @@ func WithFilterFunc(filterFunc ...func(*http.Request) bool) Option {
 		c.filterFunc = filterFunc
 	})
 }
+
+//newConfigWithOptions  另外一種options寫法
+func newConfigWithOptions(options ...ClientOption) *config {
+	c := &config{
+		Propagators:    otel.GetTextMapPropagator(),
+		TracerProvider: otel.GetTracerProvider(),
+		MeterProvider:  global.GetMeterProvider(),
+	}
+
+	for _, opt := range options {
+		opt(c)
+	}
+	return c
+}
+
+type ClientOption func(c *config)
+
+// WithRT 另外一種options寫法
+func WithRT(base http.RoundTripper) ClientOption {
+	// this is the ClientOption function type
+	return func(c *config) {
+		c.base = base
+	}
+}

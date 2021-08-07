@@ -1,14 +1,16 @@
-module mygo
+module github.com/jjmengze/mygo
 
 go 1.16
 
 require (
+	github.com/99designs/gqlgen v0.13.0
 	github.com/gorilla/mux v1.7.3
 	github.com/lib/pq v1.10.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.6 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/pflag v1.0.5
+	github.com/vektah/gqlparser/v2 v2.1.0
 	go.opentelemetry.io/otel v1.0.0-RC1
 	go.opentelemetry.io/otel/exporters/jaeger v1.0.0-RC1
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.0.0-RC1
