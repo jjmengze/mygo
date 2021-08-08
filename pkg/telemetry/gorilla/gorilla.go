@@ -7,7 +7,7 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	oteltrace "go.opentelemetry.io/otel/trace"
-	"mygo/pkg/telemetry/instrumentation"
+	"github.com/jjmengze/mygo/pkg/telemetry/instrumentation"
 	"net/http"
 )
 

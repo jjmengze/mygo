@@ -1,8 +1,8 @@
 package main
 
 import (
-	"mygo/pkg/repo"
-	"mygo/pkg/repo/gorm"
+	"github.com/jjmengze/mygo/pkg/repo"
+	"github.com/jjmengze/mygo/pkg/repo/gorm"
 	"time"
 )
 

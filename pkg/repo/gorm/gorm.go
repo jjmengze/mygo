@@ -5,8 +5,8 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"k8s.io/klog"
-	"mygo/pkg/backoffmanager"
-	"mygo/pkg/repo"
+	"github.com/jjmengze/mygo/pkg/backoffmanager"
+	"github.com/jjmengze/mygo/pkg/repo"
 	"time"
 
 	// database driver for gorm

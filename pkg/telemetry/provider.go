@@ -3,6 +3,7 @@ package telemetry
 import (
 	"context"
 	"errors"
+	"github.com/jjmengze/mygo/pkg/valid"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
@@ -20,7 +21,6 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"google.golang.org/grpc"
 	"k8s.io/klog"
-	"mygo/pkg/valid"
 	"net"
 	"net/http"
 	"strconv"

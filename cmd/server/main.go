@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/spf13/pflag"
 	"math/rand"
-	"mygo/cmd/server/app"
+	"github.com/jjmengze/mygo/cmd/server/app"
 	"os"
 	"strings"
 	"time"

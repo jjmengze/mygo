@@ -5,7 +5,7 @@ import (
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 	"k8s.io/klog"
-	errPkg "mygo/pkg/errors"
+	errPkg "github.com/jjmengze/mygo/pkg/errors"
 	"time"
 )
 

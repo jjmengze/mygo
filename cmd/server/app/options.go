@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/spf13/pflag"
 	"io/ioutil"
-	"mygo/cmd/server/app/config"
-	"mygo/pkg/server"
+	"github.com/jjmengze/mygo/cmd/server/app/config"
+	"github.com/jjmengze/mygo/pkg/server"
 	"sigs.k8s.io/yaml"
 )
 

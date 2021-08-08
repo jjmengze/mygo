@@ -1,6 +1,6 @@
 package config
 
-import "mygo/pkg/telemetry"
+import "github.com/jjmengze/mygo/pkg/telemetry"
 
 type Config struct {
 	// ExampleServer is the IP address and port to request the example server,

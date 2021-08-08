@@ -1,6 +1,6 @@
 package config
 
-import "mygo/pkg/telemetry"
+import "github.com/jjmengze/mygo/pkg/telemetry"
 
 type Config struct {
 	// HealthzBindAddress is the IP address and port for the health check server to serve on,

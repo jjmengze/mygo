@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"k8s.io/klog"
-	"mygo/pkg/valid"
+	"github.com/jjmengze/mygo/pkg/valid"
 	"net"
 	"net/http"
 	"strconv"
