@@ -1,9 +1,14 @@
 exampleServer: "http://0.0.0.0:8080"
+
 telemetry:
   name: client
   resourceAttributes:
     - key: env
       value: example-client
-  endPoint: "0.0.0.0:64665"
+  endPoint: "0.0.0.0:6831"
   prometheus:
     metricsBindAddress: "0.0.0.0:10252"
+  Jaeger:
+    Mode: Agent
+#    Password: passwd
+#    UserName: admin

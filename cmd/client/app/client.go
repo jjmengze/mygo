@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/jjmengze/mygo/pkg/signal"
 	"github.com/jjmengze/mygo/pkg/telemetry"
-	telemetryhttp "github.com/jjmengze/mygo/pkg/telemetry/http"
+	telemetryClient "github.com/jjmengze/mygo/pkg/telemetry/http_client"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -111,7 +111,7 @@ func runCommand(cmd *cobra.Command, options *Options) error {
 	defer requestLatency.Unbind()
 
 	latencyMs := float64(time.Since(time.Now())) / 1e6
-	httpClient := telemetryhttp.HttpClientWithTransport(http.DefaultTransport)
+	httpClient := telemetryClient.HttpClientWithTransport(http.DefaultTransport)
 
 	for i := 0; i < 10; i++ {
 		func(c context.Context) {

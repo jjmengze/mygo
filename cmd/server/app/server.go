@@ -3,6 +3,11 @@ package app
 import (
 	"context"
 	"fmt"
+	"github.com/jjmengze/mygo/pkg/route/gorilla"
+	"github.com/jjmengze/mygo/pkg/server"
+	"github.com/jjmengze/mygo/pkg/signal"
+	"github.com/jjmengze/mygo/pkg/telemetry"
+	telemetrygorila "github.com/jjmengze/mygo/pkg/telemetry/gorilla"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -10,11 +15,6 @@ import (
 	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/trace"
 	"k8s.io/klog"
-	"github.com/jjmengze/mygo/pkg/route/gorilla"
-	"github.com/jjmengze/mygo/pkg/server"
-	"github.com/jjmengze/mygo/pkg/signal"
-	"github.com/jjmengze/mygo/pkg/telemetry"
-	telemetrygorila "github.com/jjmengze/mygo/pkg/telemetry/gorilla"
 	"net/http"
 	"os"
 	"time"
@@ -143,7 +143,9 @@ func Run(ctx context.Context, options *Options) error {
 	mux.HandleFunc("/happy", func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Println("Hello")
 		writer.WriteHeader(http.StatusOK)
-		//writer.Write([]byte("Hello, World!"))
+		writer.Write([]byte("Hello, World!"))
+		writer.Header().Add("HELLO", "WORD")
+
 	})
 
 	//route.NewAPIServer(mux)

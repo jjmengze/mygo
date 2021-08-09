@@ -15,9 +15,15 @@ type Prometheus struct {
 }
 
 type Jaeger struct {
+	Mode     Mode
 	Password string `json:"password"`
 	UserName string `json:"userName"`
 }
+
+type Mode string
+
+var Agent Mode = "Agent"
+var Collector Mode = "Collector"
 
 type Attributes struct {
 	Key   string `json:"key"`

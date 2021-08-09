@@ -1,4 +1,4 @@
-package http
+package http_client
 
 import (
 	"go.opentelemetry.io/otel"
@@ -10,7 +10,7 @@ import (
 )
 
 // config represents the configuration options available for the http.Handler
-// and http.Transport types.
+// and http_client.Transport types.
 type config struct {
 	Propagators    propagation.TextMapPropagator
 	TracerProvider trace.TracerProvider

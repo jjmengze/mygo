@@ -58,6 +58,7 @@ func NewTelemetryProvider(ctx context.Context, config Config) (func() error, err
 
 	if config.Prometheus != nil {
 		metricProvider, err = initPrometheusProvider(ctx, config.Prometheus)
+		global.SetMeterProvider(metricProvider.MeterProvider())
 	}
 
 	if err != nil {
@@ -69,7 +70,6 @@ func NewTelemetryProvider(ctx context.Context, config Config) (func() error, err
 	// set global propagator to tracecontext (the default is no-op).
 	otel.SetTextMapPropagator(propagation.TraceContext{})
 
-	global.SetMeterProvider(metricProvider.MeterProvider())
 	return func() error {
 		// Shutdown will flush any remaining spans and shut down the exporter.
 		return tracerProvider.Shutdown(ctx)
@@ -121,8 +121,20 @@ func initJaegerTracerProvider(ctx context.Context, config Config) (*sdktrace.Tra
 		semconv.ServiceNameKey.String(config.Name),
 	)
 
+	var exp *jaeger.Exporter
+	var err error
 	//todo maybe jaeeger server should login wih username and password
-	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(config.EndPoint)))
+	switch config.Jaeger.Mode {
+	case Collector:
+		exp, err = jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(config.EndPoint)))
+	case Agent:
+		host, port, err := net.SplitHostPort(config.EndPoint)
+		if err != nil {
+			klog.Warningf("Jaeger Agent provide Endpoint Error %v , should provide <agent ip>:<agent port>", err)
+		}
+		exp, err = jaeger.New(jaeger.WithAgentEndpoint(jaeger.WithAgentHost(host), jaeger.WithAgentPort(port)))
+	}
+
 	if err != nil {
 		return nil, err
 	}
