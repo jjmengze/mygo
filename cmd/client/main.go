@@ -1,9 +1,10 @@
 package main
 
 import (
+	"github.com/jjmengze/mygo/cmd/client/app"
+	"github.com/jjmengze/mygo/pkg/log"
 	"github.com/spf13/pflag"
 	"math/rand"
-	"github.com/jjmengze/mygo/cmd/client/app"
 	"os"
 	"strings"
 	"time"
@@ -12,7 +13,7 @@ import (
 func main() {
 	rand.Seed(time.Now().UnixNano())
 	command := app.NewClientCommand()
-
+	log.InitLogs()
 	pflag.CommandLine.SetNormalizeFunc(WordSepNormalizeFunc)
 	//pflag.CommandLine.AddGoFlagSet(goflag.CommandLine)
 	if err := command.Execute(); err != nil {

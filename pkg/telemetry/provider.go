@@ -21,6 +21,7 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"google.golang.org/grpc"
 	"k8s.io/klog"
+	"log"
 	"net"
 	"net/http"
 	"strconv"
@@ -132,7 +133,7 @@ func initJaegerTracerProvider(ctx context.Context, config Config) (*sdktrace.Tra
 		if err != nil {
 			klog.Warningf("Jaeger Agent provide Endpoint Error %v , should provide <agent ip>:<agent port>", err)
 		}
-		exp, err = jaeger.New(jaeger.WithAgentEndpoint(jaeger.WithAgentHost(host), jaeger.WithAgentPort(port)))
+		qexp, err = jaeger.New(jaeger.WithAgentEndpoint(jaeger.WithAgentHost(host), jaeger.WithAgentPort(port), jaeger.WithAttemptReconnectingInterval(time.Millisecond), jaeger.WithLogger(log.Default())))
 	}
 
 	if err != nil {
