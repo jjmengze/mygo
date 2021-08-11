@@ -7,11 +7,12 @@ telemetry:
     - key: env
       value: example
   #use jaeger agent
-  endPoint: "http://0.0.0.0:14268/api/traces"
+  #  endPoint: "http://0.0.0.0:14268/api/traces"
+  endPoint: "0.0.0.0:6831"
   Prometheus:
     MetricsBindAddress: "0.0.0.0:10251"
   #    EndPoint: http://localhost:14268/api/traces
-  Jaeger:
-    Mode: Collector
-    Password: passwd
-    UserName: admin
+#  Jaeger:
+#    Mode: Collector
+#    Password: passwd
+#    UserName: admin

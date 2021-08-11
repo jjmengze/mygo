@@ -108,6 +108,7 @@ func initCollectorProvider(ctx context.Context, config Config) (*sdktrace.Tracer
 	// Register the trace exporter with a TracerProvider, using a batch
 	// span processor to aggregate spans before export.
 	bsp := sdktrace.NewBatchSpanProcessor(traceExporter)
+
 	tracerProvider := sdktrace.NewTracerProvider(
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),
 		sdktrace.WithResource(res),
@@ -133,17 +134,21 @@ func initJaegerTracerProvider(ctx context.Context, config Config) (*sdktrace.Tra
 		if err != nil {
 			klog.Warningf("Jaeger Agent provide Endpoint Error %v , should provide <agent ip>:<agent port>", err)
 		}
-		qexp, err = jaeger.New(jaeger.WithAgentEndpoint(jaeger.WithAgentHost(host), jaeger.WithAgentPort(port), jaeger.WithAttemptReconnectingInterval(time.Millisecond), jaeger.WithLogger(log.Default())))
+		exp, err = jaeger.New(jaeger.WithAgentEndpoint(jaeger.WithAgentHost(host), jaeger.WithAgentPort(port), jaeger.WithAttemptReconnectingInterval(time.Millisecond), jaeger.WithLogger(log.Default())))
 	}
 
 	if err != nil {
 		return nil, err
 	}
+	//Simple Span processor detection
+	//sp := sdktrace.NewSimpleSpanProcessor(exp)
 	tracerProvider := sdktrace.NewTracerProvider(
 		// Always be sure to batch in production.
 		sdktrace.WithBatcher(exp),
 		// Record information about this application in an Resource.
 		sdktrace.WithResource(res),
+		//use processor detection
+		//sdktrace.WithSpanProcessor(sp),
 	)
 
 	return tracerProvider, nil

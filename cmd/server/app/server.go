@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/jjmengze/mygo/pkg/route/gorilla"
 	"github.com/jjmengze/mygo/pkg/server"
@@ -76,26 +77,28 @@ func runCommand(cmd *cobra.Command, options *Options) error {
 	ctx, cancel := context.WithCancel(signal.SetupSignalContext())
 	defer cancel()
 
-	flushTracer, err := telemetry.NewTelemetryProvider(ctx, options.ComponentConfig.Telemetry)
+	flush, err := telemetry.NewTelemetryProvider(ctx, options.ComponentConfig.Telemetry)
 	if err != nil {
 		klog.Warning("tracing config error:", err)
 	}
-	defer flushTracer()
+	defer flush()
+	otel.Handle(errors.New("test"))
+	//otel.library.name test-tracer
 	tracer := otel.Tracer("test-tracer")
+
 	meter := global.Meter("test-meter")
 	commonLabels := []attribute.KeyValue{
 		attribute.String("labelA", "chocolate"),
 		attribute.String("labelB", "raspberry"),
 		attribute.String("labelC", "vanilla"),
 	}
-
+	//span operation name
 	tracerCtx, span := tracer.Start(
-		ctx,
+		context.Background(),
 		"CollectorExporter-Example",
 		trace.WithAttributes(commonLabels...))
-	defer span.End()
 
-	childCtx, iSpan := tracer.Start(tracerCtx, fmt.Sprintf("start-%d", -1))
+	childCtx, iSpan := tracer.Start(tracerCtx, fmt.Sprintf("start%d", -1))
 	workTime := metric.Must(meter).
 		NewInt64Counter(
 			"test time",
@@ -110,19 +113,16 @@ func runCommand(cmd *cobra.Command, options *Options) error {
 	defer requestLatency.Unbind()
 	latencyMs := float64(time.Since(time.Now())) / 1e6
 	for i := 0; i < 10; i++ {
-		func(c context.Context) {
-			var sp trace.Span
-			requestLatency.Record(childCtx, latencyMs)
-			childCtx, sp = tracer.Start(childCtx, fmt.Sprintf("Sample-%d", i))
-			requestLatency.Record(ctx, latencyMs)
-			latencyMs = float64(time.Since(time.Now())) / 1e6
-			<-time.After(time.Millisecond)
-			sp.End()
-		}(childCtx)
-
+		var sp trace.Span
+		requestLatency.Record(childCtx, latencyMs)
+		childCtx, sp = tracer.Start(childCtx, fmt.Sprintf("Sample-%d", i))
+		requestLatency.Record(ctx, latencyMs)
+		latencyMs = float64(time.Since(time.Now())) / 1e6
+		<-time.After(time.Duration(latencyMs))
+		sp.End()
 	}
-	defer iSpan.End()
-
+	iSpan.End()
+	span.End()
 	//cc, sched, err := Setup(ctx, opts, registryOptions...)
 	//if err != nil {
 	//	return err
@@ -141,7 +141,6 @@ func Run(ctx context.Context, options *Options) error {
 	}
 	mux.Use(telemetrygorila.Middleware())
 	mux.HandleFunc("/happy", func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Println("Hello")
 		writer.WriteHeader(http.StatusOK)
 		writer.Write([]byte("Hello, World!"))
 		writer.Header().Add("HELLO", "WORD")

@@ -2,11 +2,12 @@ package gorm
 
 import (
 	"errors"
+	"github.com/jjmengze/mygo/pkg/backoffmanager"
+	"github.com/jjmengze/mygo/pkg/repo"
+	gormTelemetry "github.com/jjmengze/mygo/pkg/telemetry/gorm"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"k8s.io/klog"
-	"github.com/jjmengze/mygo/pkg/backoffmanager"
-	"github.com/jjmengze/mygo/pkg/repo"
 	"time"
 
 	// database driver for gorm
@@ -54,6 +55,8 @@ func NewDatabase(config repo.Config) (*gorm.DB, error) {
 		err = db.Ping()
 		if err != nil {
 			klog.Errorf("%s ping DB error: %v", config.Driver, err)
+		}else {
+			break
 		}
 	}
 
@@ -82,4 +85,10 @@ func translationDialector(driver repo.DriverType, connection string) (gorm.Diale
 	default:
 		return nil, errors.New("Not support type")
 	}
+}
+
+// GormWithPlugins Initialize gormTelemetry plugin with options
+func GormWithPlugins(db *gorm.DB) error {
+	plugin := gormTelemetry.NewPlugin()
+	return db.Use(plugin)
 }
