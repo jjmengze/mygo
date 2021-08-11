@@ -112,4 +112,3 @@ func doGormOperations(ctx context.Context, db *gorm.DB) {
 	db.Exec("SELECT * FROM not_found")
 	fmt.Println("Done")
 }
-cmd/server/app/server.go config/server.yaml example/db/gorm.go pkg/repo/gorm/gorm.go pkg/repo/repo.go pkg/telemetry/gorm/callback.go pkg/telemetry/gorm/config.go pkg/telemetry/gorm/plugin.go pkg/telemetry/gorm/util.go pkg/telemetry/provider.go
