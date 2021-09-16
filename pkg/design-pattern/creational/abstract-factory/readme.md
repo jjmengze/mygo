@@ -59,3 +59,72 @@ func (a ModernFurnishingFactory) CreateSofa() sofa.Sofa {
 
 工廠需要把所有需要生產的家具，依照特定的風格撰寫生產的方式。以上範例為工廠生產現代風的桌子、椅子、沙發的生產方式。
 
+
+
+第二個例子為 kubernetes 裡面常見的範例 SharedInformerFactory 主宰了如何建立 kubernetes 各項 資源的 informer 如何生成，例如 app 的 informer 、Batch 的 informer 等等。
+```go
+// SharedInformerFactory provides shared informers for resources in all known
+// API group versions.
+type SharedInformerFactory interface {
+	internalinterfaces.SharedInformerFactory
+	ForResource(resource schema.GroupVersionResource) (GenericInformer, error)
+	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
+
+	Admissionregistration() admissionregistration.Interface
+	Internal() apiserverinternal.Interface
+	Apps() apps.Interface
+	Autoscaling() autoscaling.Interface
+	Batch() batch.Interface
+	Certificates() certificates.Interface
+	Coordination() coordination.Interface
+	Core() core.Interface
+	Discovery() discovery.Interface
+	Events() events.Interface
+	Extensions() extensions.Interface
+	Flowcontrol() flowcontrol.Interface
+	Networking() networking.Interface
+	Node() node.Interface
+	Policy() policy.Interface
+	Rbac() rbac.Interface
+	Scheduling() scheduling.Interface
+	Storage() storage.Interface
+}
+
+type sharedInformerFactory struct {
+    client           kubernetes.Interface
+    namespace        string
+    tweakListOptions internalinterfaces.TweakListOptionsFunc
+    lock             sync.Mutex
+    defaultResync    time.Duration
+    customResync     map[reflect.Type]time.Duration
+    
+    informers map[reflect.Type]cache.SharedIndexInformer
+    // startedInformers is used for tracking which informers have been started.
+    // This allows Start() to be called multiple times safely.
+    startedInformers map[reflect.Type]bool
+}
+
+// NewSharedInformerFactoryWithOptions constructs a new instance of a SharedInformerFactory with additional options.
+func NewSharedInformerFactoryWithOptions(client kubernetes.Interface, defaultResync time.Duration, options ...SharedInformerOption) SharedInformerFactory {
+    factory := &sharedInformerFactory{
+    client:           client,
+    namespace:        v1.NamespaceAll,
+    defaultResync:    defaultResync,
+    informers:        make(map[reflect.Type]cache.SharedIndexInformer),
+    startedInformers: make(map[reflect.Type]bool),
+    customResync:     make(map[reflect.Type]time.Duration),
+    }
+    
+    // Apply all options
+    for _, opt := range options {
+    factory = opt(factory)
+    }
+    
+return factory
+}
+
+func (f *sharedInformerFactory) Apps() apps.Interface {
+    return apps.New(f, f.namespace, f.tweakListOptions)
+}
+
+```
