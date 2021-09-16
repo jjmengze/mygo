@@ -1,17 +1,13 @@
-package chair
+package desk
 
 import "fmt"
 
-type VictorianChair struct{}
+type VictorianDesk struct{}
 
-func (*VictorianChair) SitOn() {
-	fmt.Print("it is Victorian!!!! \n")
+func (*VictorianDesk) GetDrawer() {
+	fmt.Print("it is Drawer of Victorian Desk !!!! \n")
 }
 
-func (*VictorianChair) Leave() {
-	fmt.Print("oh why you leave Victorian \n")
-}
-
-func (*VictorianChair) HasLeg() {
-	fmt.Print("Victorian chair have 4 leg! \n")
+func (*VictorianDesk) AutoRising() {
+	fmt.Print("Victorian can not Rising \n")
 }

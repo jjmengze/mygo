@@ -2,16 +2,16 @@ package chair
 
 import "fmt"
 
-type ModernChair struct{}
+type VictorianChair struct{}
 
-func (*ModernChair) SitOn() {
-	fmt.Print("it is google modern chair please sit it on \n")
+func (*VictorianChair) SitOn() {
+	fmt.Print("it is Victorian!!!! \n")
 }
 
-func (*ModernChair) Leave() {
-	fmt.Print("modern chair hope you enjoy it \n")
+func (*VictorianChair) Leave() {
+	fmt.Print("oh why you leave Victorian \n")
 }
 
-func (*ModernChair) HasLeg() {
-	fmt.Print("modern chair have no any leg! \n")
+func (*VictorianChair) HasLeg() {
+	fmt.Print("Victorian chair have 4 leg! \n")
 }

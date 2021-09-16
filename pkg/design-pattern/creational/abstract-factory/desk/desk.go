@@ -1,7 +1,6 @@
-package chair
+package desk
 
-type Chair interface {
-	SitOn()
-	HasLeg()
-	Leave()
+type Desk interface {
+	GetDrawer()
+	AutoRising()
 }

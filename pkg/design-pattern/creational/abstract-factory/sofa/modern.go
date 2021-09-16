@@ -1,17 +1,17 @@
-package chair
+package sofa
 
 import "fmt"
 
-type ModernChair struct{}
+type ModernSofa struct{}
 
-func (*ModernChair) SitOn() {
-	fmt.Print("it is google modern chair please sit it on \n")
+func (*ModernSofa) SitOn() {
+	fmt.Print("it is google modern sofa please sit it on \n")
 }
 
-func (*ModernChair) Leave() {
-	fmt.Print("modern chair hope you enjoy it \n")
+func (*ModernSofa) Leave() {
+	fmt.Print("modern sofa hope you enjoy it \n")
 }
 
-func (*ModernChair) HasLeg() {
-	fmt.Print("modern chair have no any leg! \n")
+func (*ModernSofa) GetSoftLevel() {
+	fmt.Print("Victorian sofa is Modern Modern Modern! \n")
 }

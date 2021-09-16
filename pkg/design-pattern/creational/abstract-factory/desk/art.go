@@ -1,17 +1,13 @@
-package chair
+package desk
 
 import "fmt"
 
-type ArtChair struct{}
+type ArtDesk struct{}
 
-func (*ArtChair) SitOn() {
-	fmt.Print("it is a beautifully art chair !!!! \n")
+func (*ArtDesk) GetDrawer() {
+	fmt.Print("it is Drawer of beautifully Desk !!!! \n")
 }
 
-func (*ArtChair) Leave() {
-	fmt.Print("Be careful not to break \n")
-}
-
-func (*ArtChair) HasLeg() {
-	fmt.Print("ArtChair chair have 1 leg! \n")
+func (*ArtDesk) AutoRising() {
+	fmt.Print("beautifully is beautifully Rising !!!!!!\n")
 }

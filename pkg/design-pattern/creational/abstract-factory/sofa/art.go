@@ -1,17 +1,17 @@
-package chair
+package sofa
 
 import "fmt"
 
-type ArtChair struct{}
+type ArtSofa struct{}
 
-func (*ArtChair) SitOn() {
-	fmt.Print("it is a beautifully art chair !!!! \n")
+func (*ArtSofa) SitOn() {
+	fmt.Print("it is a beautifully art sofa !!!! \n")
 }
 
-func (*ArtChair) Leave() {
+func (*ArtSofa) Leave() {
 	fmt.Print("Be careful not to break \n")
 }
 
-func (*ArtChair) HasLeg() {
-	fmt.Print("ArtChair chair have 1 leg! \n")
+func (*ArtSofa) GetSoftLevel() {
+	fmt.Print("ArtSofa sofa is art art art! \n")
 }

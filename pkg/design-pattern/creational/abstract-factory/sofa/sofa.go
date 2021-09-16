@@ -1,7 +1,7 @@
-package chair
+package sofa
 
-type Chair interface {
+type Sofa interface {
 	SitOn()
-	HasLeg()
+	GetSoftLevel()
 	Leave()
 }
