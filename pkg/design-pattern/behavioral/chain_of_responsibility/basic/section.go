@@ -1,4 +1,4 @@
-package chain_of_responsibility
+package basic
 
 type Section interface {
 	Execute(*Task)
