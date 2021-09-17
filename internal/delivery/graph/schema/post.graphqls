@@ -1,0 +1,44 @@
+type Post {
+    "識別碼"
+    id: ID!
+    "作者"
+    author: User
+    "標題"
+    title: String
+    "內容"
+    content: String
+    "按讚者"
+    likeGivers: [User]
+    "建立時間 (ISO 格式)"
+    createdAt: String
+}
+
+
+type Query{
+    "取得所有貼文"
+    posts: [Post]
+    "依照 id 取得特定貼文"
+    post(id: ID!): Post
+}
+
+#組合 Mutation addPost 所需要的input
+input AddPostInput {
+    title: String!
+    content: String
+}
+# Mutation 定義
+type Mutation {
+    "新增貼文"
+    addPost(input: AddPostInput!): Post
+    "貼文按讚 (收回讚)"
+    likePost(postId: ID!): Post
+}
+
+
+# Mutation 定義
+#type Mutation {
+#    "新增貼文"
+#    addPost(title: String!, content: String!): Post
+#    "貼文按讚 (收回讚)"
+#    likePost(postId: ID!): Post
+#}

@@ -1,0 +1,39 @@
+"""
+使用者
+"""
+type User{
+    # can not return empty ,must return null or something
+    "識別碼"
+    id : Int !
+    "帳號 email"
+    email: String!
+    "名字"
+    name: String
+    "年齡"
+    age: Int
+    "朋友們"
+    friends: [User]
+
+    "身高 (預設為 CENTIMETRE)"
+    height(unit: HeightUnit = CENTIMETRE): Float
+    "體重 (預設為 KILOGRAM)"
+    weight(unit: WeightUnit = KILOGRAM): Float
+    "貼文"
+    posts: [Post]
+}
+
+
+
+extend type Query{
+    "取得所有使用者"
+    users: User
+    "取得當下使用者"
+    me: User
+
+    "測試用 Hello World"
+    hello: String
+
+    "取得特定 user (name 為必填)"
+    user(name: String!): User
+}
+
