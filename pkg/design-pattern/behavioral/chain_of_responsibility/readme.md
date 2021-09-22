@@ -31,3 +31,18 @@ func (c *Context) Next() {
     }
 }
 ```
+
+## kubernetes example
+```go
+func NewMultiplexerPluginWrapper(plugins ...Plugin) *MultiplexerPluginWrapper {
+	return &MultiplexerPluginWrapper{
+		plugins: plugins,
+	}
+}
+
+func NewAuthorLoggerPluginWrapper(plugin Plugin) *AuthorLoggerPluginWrapper {
+    return &AuthorLoggerPluginWrapper{
+        plugin: plugin,
+    }
+}
+```
