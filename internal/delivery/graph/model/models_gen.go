@@ -8,11 +8,16 @@ import (
 	"strconv"
 )
 
+type Node interface {
+	IsNode()
+}
+
 type AddPostInput struct {
 	Title   string  `json:"title"`
 	Content *string `json:"content"`
 }
 
+// 貼文
 type Post struct {
 	// 識別碼
 	ID string `json:"id"`
@@ -28,10 +33,12 @@ type Post struct {
 	CreatedAt *string `json:"createdAt"`
 }
 
+func (Post) IsNode() {}
+
 // 使用者
 type User struct {
 	// 識別碼
-	ID int `json:"id"`
+	ID string `json:"id"`
 	// 帳號 email
 	Email string `json:"email"`
 	// 名字
@@ -47,6 +54,8 @@ type User struct {
 	// 貼文
 	Posts []*Post `json:"posts"`
 }
+
+func (User) IsNode() {}
 
 // 高度單位
 type HeightUnit string

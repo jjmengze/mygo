@@ -6,8 +6,6 @@ package graph
 import (
 	"context"
 	"fmt"
-	"strconv"
-
 	"github.com/jjmengze/mygo/internal/delivery/graph/generated"
 	"github.com/jjmengze/mygo/internal/delivery/graph/model"
 )
@@ -37,10 +35,10 @@ func (r *mutationResolver) LikePost(ctx context.Context, postID string) (*model.
 }
 
 func (r *postResolver) Author(ctx context.Context, obj *model.Post) (*model.User, error) {
-	id, _ := strconv.Atoi(obj.ID)
+	//id, _ := strconv.Atoi(obj.ID)
 	name := "test"
 	return &model.User{
-		ID:   id,
+		ID:   obj.ID,
 		Name: &name,
 	}, nil
 }

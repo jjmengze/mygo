@@ -1,4 +1,7 @@
-type Post {
+"""
+貼文
+"""
+type Post implements Node{
     "識別碼"
     id: ID!
     "作者"
@@ -11,6 +14,8 @@ type Post {
     likeGivers: [User]
     "建立時間 (ISO 格式)"
     createdAt: String
+    UpdatedAt: String
+    DeletedAt: String
 }
 
 

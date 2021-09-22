@@ -36,3 +36,7 @@ func (e *_error) Error() string {
 	b.WriteString(e.Message)
 	return b.String()
 }
+
+var (
+	ErrInvalidInput = &_error{Message: "One of the request inputs is not valid.", Status: http.StatusBadRequest, GRPCCode: codes.InvalidArgument}
+)
