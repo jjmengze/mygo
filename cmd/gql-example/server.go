@@ -48,6 +48,8 @@ func main() {
 	}
 	repository := repo.NewRepository(read, write)
 	userUsecase := usecase.NewUserService(repository)
+	authUsecase := usecase.NewAuthService(repository)
+	usecase := usecase.NewUseCase(userUsecase, authUsecase)
 	//resolver := graph.NewResolver(userUsecase)
 
 	//ctx, cancel := context.WithCancel(signal.SetupSignalContext())
@@ -82,7 +84,7 @@ func main() {
 	//log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	//log.Fatal(http.ListenAndServe(":"+port, nil))
 	e := echo.New()
-	handler := http.NewHandler(userUsecase)
+	handler := http.NewHandler(usecase)
 	http.SetRoutes(e, handler)
 	srv, err := server.NewServer(&server.Config{BindAddress: "0.0.0.0:" + port})
 	srv.ServeHTTP(context.Background(), e.Server)

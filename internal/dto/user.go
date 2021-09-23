@@ -5,8 +5,8 @@ import (
 	"github.com/jjmengze/mygo/internal/model"
 )
 
-// NewAccountDto ...
-func NewAccountDto(input *view.RegisterAccount) *model.User {
+// NewAccountDtoUser ...
+func NewAccountDtoUser(input *view.RegisterAccount) *model.User {
 	enable := true
 	return &model.User{
 		Password: input.Password,
@@ -34,5 +34,15 @@ func NewAccountResponseDto(input *model.User, err error) *view.RegisterAccountRe
 	}
 	return &view.RegisterAccountResponse{
 		Error: err.Error(),
+	}
+}
+
+// NewLoginDtoUser ...
+func NewLoginDtoUser(input *view.LoginInfo) *model.QueryUser {
+	return &model.QueryUser{
+		User: &model.User{
+			Password: input.Password,
+			Name:     input.Name,
+		},
 	}
 }

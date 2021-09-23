@@ -27,9 +27,10 @@ func NewErrors(status int, grpcCode codes.Code, message string) *_error {
 }
 
 var (
-	ErrInternalError         = NewErrors(http.StatusInternalServerError, codes.Internal, "The server encountered an internal error. Please retry the request.")
-	ErrResourceNotFound      = NewErrors(http.StatusNotFound, codes.NotFound, "The specified resource does not exist.")
-	ErrResourceAlreadyExists = NewErrors(http.StatusConflict, codes.AlreadyExists, "The specified resource already exists.")
+	ErrInternalError               = NewErrors(http.StatusInternalServerError, codes.Internal, "The server encountered an internal error. Please retry the request.")
+	ErrResourceNotFound            = NewErrors(http.StatusNotFound, codes.NotFound, "The specified resource does not exist.")
+	ErrResourceAlreadyExists       = NewErrors(http.StatusConflict, codes.AlreadyExists, "The specified resource already exists.")
+	ErrUsernameOrPasswordIncorrect = NewErrors(http.StatusUnauthorized, codes.Unauthenticated, "Username or Password is incorrect." )
 )
 
 func (e *_error) Error() string {

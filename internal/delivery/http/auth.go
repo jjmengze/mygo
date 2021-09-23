@@ -12,7 +12,23 @@ import (
 )
 
 func (h *Handler) loginEndpoint(c echo.Context) error {
-	return nil
+	ctx := c.Request().Context()
+
+	loginInfo := view.LoginInfo{}
+
+	if err := c.Bind(&loginInfo); err != nil {
+		return errors.Wrap(errMsg.ErrInvalidInput, err.Error())
+	}
+
+	req := dto.NewLoginDtoUser(&loginInfo)
+	user, err := h.svc.Login(ctx, req)
+	if err != nil {
+		err = errors.New(fmt.Sprintf("登入失敗: %v", err))
+		resp := dto.NewAccountResponseDto(user, err)
+		return c.JSON(http.StatusUnauthorized, resp)
+	}
+
+	return c.JSON(http.StatusOK, dto.NewAccountResponseDto(user, err))
 }
 
 func (h *Handler) registerEndpoint(c echo.Context) (err error) {
@@ -34,7 +50,7 @@ func (h *Handler) registerEndpoint(c echo.Context) (err error) {
 	//}
 
 	//create in identity
-	req := dto.NewAccountDto(&registerAcc)
+	req := dto.NewAccountDtoUser(&registerAcc)
 
 	accountResp, err := h.svc.CreateUser(ctx, req)
 

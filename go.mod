@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/99designs/gqlgen v0.14.0
 	github.com/go-sql-driver/mysql v1.6.0
+	github.com/google/uuid v1.1.2
 	github.com/gorilla/mux v1.7.3
 	github.com/labstack/echo/v4 v4.6.0
 	github.com/lib/pq v1.10.0 // indirect

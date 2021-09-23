@@ -5,6 +5,7 @@ import (
 	"github.com/jjmengze/mygo/internal/model"
 	"github.com/jjmengze/mygo/internal/repo"
 	"github.com/pkg/errors"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // UserService Address service implement...
@@ -30,6 +31,12 @@ func (u userService) ListUser(ctx context.Context, condition model.QueryUser) ([
 }
 
 func (u userService) CreateUser(ctx context.Context, user *model.User) (*model.User, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return &model.User{}, err
+	}
+	user.Password = string(hashedPassword)
+
 	createdUser, err := u.repo.CreateUser(ctx, user)
 	if err != nil {
 		err = errors.Wrapf(err, "user create CreateUser failed.")
