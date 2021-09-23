@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/99designs/gqlgen v0.14.0
+	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gorilla/mux v1.7.3
 	github.com/labstack/echo/v4 v4.6.0
 	github.com/lib/pq v1.10.0 // indirect
@@ -23,6 +24,7 @@ require (
 	go.opentelemetry.io/otel/sdk/export/metric v0.21.0
 	go.opentelemetry.io/otel/sdk/metric v0.21.0
 	go.opentelemetry.io/otel/trace v1.0.0-RC1
+	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
 	google.golang.org/grpc v1.38.0
 	gorm.io/driver/mysql v1.1.1
 	gorm.io/driver/postgres v1.1.0

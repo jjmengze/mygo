@@ -8,6 +8,7 @@ import (
 // User ...
 type User struct {
 	gorm.Model
+	Password string  `gorm:"column:password;NOT NULL;"`
 	Email    string  `gorm:"column:email;NOT NULL;"`
 	Name     string  `gorm:"column:name;unique;type:varchar(100);not null;"`
 	NikeName string  `gorm:"column:nikeName;unique;not null;index:;"`

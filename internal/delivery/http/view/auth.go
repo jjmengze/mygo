@@ -2,12 +2,24 @@ package view
 
 // RegisterAccount 註冊帳號
 type RegisterAccount struct {
-	NickName string  `json:"nickName"`
-	Password string  `json:"password"`
-	Age      uint8   `json:"age"`
-	Height   float32 `json:"height"`
-	Weight   float32 `json:"weight"`
-	Email    string  `json:"email"`
-	Name     string  `json:"name" validate:"required"`
-	Type     int8    `json:"type" validate:"required"`
+	NickName string `json:"nickName"`
+	Password string `json:"password"` // validate:"required"`
+	Age      uint8  `json:"age"`
+	Height   uint8  `json:"height"`
+	Weight   uint8  `json:"weight"`
+	Email    string `json:"email"` // validate:"required"`
+	Name     string `json:"name"`  // validate:"required"`
+	Type     int8   `json:"type"`  // validate:"required"`
+}
+
+// RegisterAccountResponse 註冊帳號
+type RegisterAccountResponse struct {
+	NickName string `json:"nickName"`
+	Age      uint8  `json:"age"`
+	Height   uint8  `json:"height"`
+	Weight   uint8  `json:"weight"`
+	Email    string `json:"email"` // validate:"required"`
+	Name     string `json:"name"`  // validate:"required"`
+	Type     int8   `json:"type"`  // validate:"required"`
+	Error    string `json:"error"`
 }

@@ -4,13 +4,14 @@ import (
 	"context"
 	"github.com/jjmengze/mygo/internal/model"
 	"github.com/jjmengze/mygo/internal/repo"
+	"github.com/pkg/errors"
 )
 
 // UserService Address service implement...
 type UserService interface {
 	GetUser(ctx context.Context, condition model.QueryUser) (model.User, error)
 	ListUser(ctx context.Context, condition model.QueryUser) ([]model.User, error)
-	CreateUser(ctx context.Context, address *model.User) (model.User, error)
+	CreateUser(ctx context.Context, user *model.User) (*model.User, error)
 	UpdateUser(ctx context.Context, updateAddress model.User, opts model.UpdateUserWhereOpts) error
 	DeleteUser(ctx context.Context, condition model.QueryUser) error
 }
@@ -28,8 +29,13 @@ func (u userService) ListUser(ctx context.Context, condition model.QueryUser) ([
 	panic("implement me")
 }
 
-func (u userService) CreateUser(ctx context.Context, address *model.User) (model.User, error) {
-	panic("implement me")
+func (u userService) CreateUser(ctx context.Context, user *model.User) (*model.User, error) {
+	createdUser, err := u.repo.CreateUser(ctx, user)
+	if err != nil {
+		err = errors.Wrapf(err, "user create CreateUser failed.")
+		return nil, err
+	}
+	return createdUser, nil
 }
 
 func (u userService) UpdateUser(ctx context.Context, updateAddress model.User, opts model.UpdateUserWhereOpts) error {

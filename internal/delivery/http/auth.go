@@ -37,8 +37,11 @@ func (h *Handler) registerEndpoint(c echo.Context) (err error) {
 	req := dto.NewAccountDto(&registerAcc)
 
 	accountResp, err := h.svc.CreateUser(ctx, req)
+
 	if err != nil {
-		return errors.WithMessage(errMsg.ErrInternalError, fmt.Sprintf("註冊帳號失敗: %v", err))
+		err = errors.New(fmt.Sprintf("註冊帳號失敗: %v", err))
+		resp := dto.NewAccountResponseDto(accountResp, err)
+		return c.JSON(http.StatusConflict, resp)
 	}
-	return c.JSON(http.StatusOK, accountResp)
+	return c.JSON(http.StatusOK, dto.NewAccountResponseDto(accountResp, err))
 }

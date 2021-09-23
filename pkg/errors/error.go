@@ -2,7 +2,10 @@ package errors
 
 import (
 	"fmt"
+	"github.com/go-sql-driver/mysql"
+	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
+	"gorm.io/gorm"
 	"net/http"
 	"strings"
 )
@@ -24,7 +27,9 @@ func NewErrors(status int, grpcCode codes.Code, message string) *_error {
 }
 
 var (
-	ErrInternalError = NewErrors(http.StatusInternalServerError, codes.Internal, "The server encountered an internal error. Please retry the request.")
+	ErrInternalError         = NewErrors(http.StatusInternalServerError, codes.Internal, "The server encountered an internal error. Please retry the request.")
+	ErrResourceNotFound      = NewErrors(http.StatusNotFound, codes.NotFound, "The specified resource does not exist.")
+	ErrResourceAlreadyExists = NewErrors(http.StatusConflict, codes.AlreadyExists, "The specified resource already exists.")
 )
 
 func (e *_error) Error() string {
@@ -40,3 +45,24 @@ func (e *_error) Error() string {
 var (
 	ErrInvalidInput = &_error{Message: "One of the request inputs is not valid.", Status: http.StatusBadRequest, GRPCCode: codes.InvalidArgument}
 )
+
+// ConvertMySQLError convert mysql error
+func ConvertMySQLError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return ErrResourceNotFound
+	}
+
+	mysqlErr, ok := err.(*mysql.MySQLError)
+	if ok {
+		if mysqlErr.Number == 1062 {
+			// the duplicate key error.
+			return ErrResourceAlreadyExists
+		}
+	}
+
+	return ErrInternalError
+}

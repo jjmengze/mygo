@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"github.com/jjmengze/mygo/internal/model"
 	"github.com/jjmengze/mygo/pkg/repo"
 	infraGorm "github.com/jjmengze/mygo/pkg/repo/gorm"
 	"gorm.io/gorm"
@@ -32,7 +33,7 @@ func NewGORM(config *repo.Config) (*gorm.DB, error) {
 		Driver:    repo.MySQL,
 		Host:      "127.0.0.1",
 		Port:      3306,
-		Database:  "silkrode_annie_test_v2",
+		Database:  "blog",
 		//InstanceName:   "",//for cloud sql
 		User:     "root",
 		Password: "123456",
@@ -49,5 +50,6 @@ func NewGORM(config *repo.Config) (*gorm.DB, error) {
 		//MaxOpenConn:    nil,//default setting
 		//SSLMode:        false, //for pg
 	})
+	db.AutoMigrate(&model.User{})
 	return db, err
 }

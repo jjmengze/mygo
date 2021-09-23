@@ -16,8 +16,8 @@ func SetRoutes(e *echo.Echo, h *Handler) {
 			return c.NoContent(200)
 		})
 
-		v1APIPublic.POST("/auth/register", h.register, middleware.RouteName("RegisterEndpoint"))
+		v1APIPublic.POST("/auth/register", h.registerEndpoint)
 
-		v1APIPublic.POST("/auth/login", h.loginEndpoint, middleware.RouteName("LoginEndpoint"))
+		v1APIPublic.POST("/auth/login", h.loginEndpoint)
 	}
 }
