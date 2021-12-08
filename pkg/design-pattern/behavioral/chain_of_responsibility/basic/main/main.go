@@ -7,7 +7,6 @@ import (
 func main() {
 	packaging := &basic.Packaging{}
 
-	// set next for assembly section
 	assembly := &basic.Assembly{}
 	assembly.SetNext(packaging)
 
