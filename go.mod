@@ -1,4 +1,4 @@
-module github.com/jjmengze/mygo
+module github.com/jjmengze/mygogo
 
 go 1.16
 
